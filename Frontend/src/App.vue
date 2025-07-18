@@ -185,6 +185,7 @@ const removeColor = (color: string) => {
   if (realTimePreview.value) applyColorChange()
 }
 
+
 const applyColorChange = () => {
   if (!selectedColors.value.length || !originalImageData.value || !ctx || !canvas || !previewCtx)
     return
@@ -196,7 +197,7 @@ const applyColorChange = () => {
   const width = canvas.width
   const height = canvas.height
 
-  // Apply color changes with tolerance
+  // Apply color changes with Euclidean distance for better gradient handling
   selectedColors.value.forEach(({ original, newColor, transparent, brightness }) => {
     const [rOld, gOld, bOld] = original.replace('rgb(', '').replace(')', '').split(',').map(Number)
     const [rNew, gNew, bNew] = transparent
@@ -210,14 +211,17 @@ const applyColorChange = () => {
       const r = newData[i]
       const g = newData[i + 1]
       const b = newData[i + 2]
-      if (
-        Math.abs(r - rOld) <= tolerance.value &&
-        Math.abs(g - gOld) <= tolerance.value &&
-        Math.abs(b - bOld) <= tolerance.value
-      ) {
-        newData[i] = transparent ? 0 : rNew
-        newData[i + 1] = transparent ? 0 : gNew
-        newData[i + 2] = transparent ? 0 : bNew
+      // Use Euclidean distance in RGB space
+      const distance = Math.sqrt(
+        (r - rOld) ** 2 + (g - gOld) ** 2 + (b - bOld) ** 2
+      )
+      if (distance <= tolerance.value * 1.732) { // Scale tolerance for Euclidean distance (sqrt(3*50^2) ≈ 86.6 for tolerance=50)
+        // Blend original and new color based on distance for smoother transitions
+        const blendFactor = distance / (tolerance.value * 1.732)
+        const blendInverse = 1 - blendFactor
+        newData[i] = transparent ? 0 : Math.round(rNew * blendInverse + r * blendFactor)
+        newData[i + 1] = transparent ? 0 : Math.round(gNew * blendInverse + g * blendFactor)
+        newData[i + 2] = transparent ? 0 : Math.round(bNew * blendInverse + b * blendFactor)
         newData[i + 3] = transparent ? 0 : 255
       }
     }
@@ -230,13 +234,13 @@ const applyColorChange = () => {
     let b = newData[i + 2]
 
     // Brightness: Use a very subtle linear scaling with a small multiplier
-    const brightnessAdjustment = brightness.value * 0.5 // Scale down to ±25 for smoother, subtler changes
+    const brightnessAdjustment = brightness.value * 0.5
     r = Math.min(255, Math.max(0, r + brightnessAdjustment))
     g = Math.min(255, Math.max(0, g + brightnessAdjustment))
     b = Math.min(255, Math.max(0, b + brightnessAdjustment))
 
     // Contrast: Use a sigmoidal curve for very gentle contrast adjustment
-    const contrastFactor = 1 + (contrast.value / 200) * 0.2 // Scales -50 to 50 to roughly 0.95 to 1.1, very subtle
+    const contrastFactor = 1 + (contrast.value / 200) * 0.2
     r = Math.min(255, Math.max(0, ((r / 255 - 0.5) * contrastFactor + 0.5) * 255))
     g = Math.min(255, Math.max(0, ((g / 255 - 0.5) * contrastFactor + 0.5) * 255))
     b = Math.min(255, Math.max(0, ((b / 255 - 0.5) * contrastFactor + 0.5) * 255))
@@ -248,9 +252,8 @@ const applyColorChange = () => {
       b /= 255
       const max = Math.max(r, g, b)
       const min = Math.min(r, g, b)
-      let h = 0,
-        s = 0,
-        l = (max + min) / 2
+      let h = 0, s = 0
+      const l = (max + min) / 2
 
       if (max !== min) {
         const d = max - min
@@ -273,8 +276,8 @@ const applyColorChange = () => {
     }
 
     const hslToRgb = (h: number, s: number, l: number) => {
-      const saturationScale = Math.min(1.2, saturation.value / 100) // Limit to 120% for very subtle max saturation
-      const adjustedS = s * saturationScale // Scale saturation gently
+      const saturationScale = Math.min(1.2, saturation.value / 100)
+      const adjustedS = s * saturationScale
       let r, g, b
       const q = l < 0.5 ? l * (1 + adjustedS) : l + adjustedS - l * adjustedS
       const p = 2 * l - q
@@ -282,10 +285,9 @@ const applyColorChange = () => {
       g = hueToRgb(p, q, h)
       b = hueToRgb(p, q, h - 1 / 3)
 
-      // Blend with original saturation for a very subtle effect
       const originalRgb = [r * 255, g * 255, b * 255]
       const [origH, origS, origL] = rgbToHsl(r * 255, g * 255, b * 255)
-      const blendFactor = 0.7 // Blend 70% original, 30% adjusted for very subtle changes
+      const blendFactor = 0.7
       r = originalRgb[0] * blendFactor + r * 255 * (1 - blendFactor)
       g = originalRgb[1] * blendFactor + g * 255 * (1 - blendFactor)
       b = originalRgb[2] * blendFactor + b * 255 * (1 - blendFactor)
@@ -305,13 +307,11 @@ const applyColorChange = () => {
     const [h, s, l] = rgbToHsl(r, g, b)
     ;[r, g, b] = hslToRgb(h, s, l)
 
-    // Apply the adjusted values back to the pixel data
     newData[i] = r
     newData[i + 1] = g
     newData[i + 2] = b
   }
 
-  // Update the canvas with the new pixel data
   ctx.putImageData(new ImageData(newData, width, height), 0, 0)
   previewCtx.putImageData(new ImageData(newData, width, height), 0, 0)
 

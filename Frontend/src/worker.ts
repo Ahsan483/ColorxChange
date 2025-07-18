@@ -5,7 +5,7 @@ self.onmessage = (e) => {
   if (type === 'image' || type === 'video') {
     // Count frequency of colors
     const colorCount = new Map<string, number>()
-    const tolerance = 200 // Adjusted for broader matching
+    const tolerance = 50
 
     const processData = (pixelData: Uint8ClampedArray) => {
       for (let i = 0; i < pixelData.length; i += 4) {
@@ -20,7 +20,7 @@ self.onmessage = (e) => {
     if (type === 'image') {
       processData(data)
     } else if (type === 'video') {
-      for (let frame of data) {
+      for (const frame of data) {
         processData(frame)
       }
     }
@@ -28,7 +28,7 @@ self.onmessage = (e) => {
     // Sort by frequency and take top 10 prominent colors
     const sortedColors = Array.from(colorCount.entries())
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 10)
+      .slice(0, 100)
       .map(([rgb]) => {
         const [r, g, b] = rgb.split(',').map(Number)
         const hex = `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
