@@ -6,22 +6,58 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String?
+  role         String        @default("user") // 'admin', 'user'
+  tier         String        @default("FREE") // 'FREE', 'PRO', 'TEAM'
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  projects     Project[]
+  subscription Subscription?
+}
+
 model Project {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
-  thumbnail String? // Base64 or URL
-  content   String // Coded as JSON string (objects, colors, etc.)
+  thumbnail String?
+  data      Json // Stores the entire Konva Stage JSON
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  versions  Version[]
+}
+
+model Version {
+  id        String   @id @default(uuid())
+  data      Json
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id])
+  stripeCustomerId String?
+  status           String // active, past_due, canceled
+  planId           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model Media {
   id        String   @id @default(uuid())
-  type      String // Image, Video
-  url       String // Storage path or URL
+  type      String
+  url       String
+  userId    String?
   createdAt DateTime @default(now())
 }

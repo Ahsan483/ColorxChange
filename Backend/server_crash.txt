@@ -1,0 +1,72 @@
+﻿node : node:events:486
+At line:1 char:1
++ node src/server.js 2>&1 
+| Out-File -FilePath 
+server_crash.txt -Encodi 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotS    pecified: 
+(node    :events:486:Str   
+ ing) [], Remote    
+Exception
+    + FullyQualifie    
+dErrorId : Nati    
+veCommandError
+ 
+      throw er; // 
+Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: 
+address already in use 
+:::5000
+    at 
+Server.setupListenHandle 
+[as _listen2] 
+(node:net:1940:16)
+    at listenInCluster 
+(node:net:1997:12)
+    at Server.listen 
+(node:net:2102:7)
+    at app.listen (C:\Users
+\Assam\Documents\GitHub\Col
+orxChange\Backend\node_modu
+les\express\lib\application
+.js:635:24)
+    at Object.<anonymous> (
+C:\Users\Assam\Documents\Gi
+tHub\ColorxChange\Backend\s
+rc\server.js:8:20)
+    at Module._compile (nod
+e:internal/modules/cjs/load
+er:1761:14)
+    at Object..js (node:int
+ernal/modules/cjs/loader:18
+93:10)
+    at Module.load (node:in
+ternal/modules/cjs/loader:1
+481:32)
+    at Module._load (node:i
+nternal/modules/cjs/loader:
+1300:12)
+    at 
+TracingChannel.traceSync (n
+ode:diagnostics_channel:328
+:14)
+Emitted 'error' event on 
+Server instance at:
+    at emitErrorNT 
+(node:net:1976:8)
+    at process.processTicks
+AndRejections (node:interna
+l/process/task_queues:89:21
+) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 5000
+}
+
+Node.js v24.12.0

@@ -10,7 +10,8 @@ import {
   FolderOpen,
   Sun,
   Moon,
-  Image as ImageIcon
+  Image as ImageIcon,
+  LogOut
 } from 'lucide-vue-next'
 
 import axios from 'axios'
@@ -18,15 +19,18 @@ import axios from 'axios'
 const store = useEditorStore()
 
 const handleFileUpload = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    if (e.target?.result) {
-      store.setUploadedFile(e.target.result as string, file.type)
+  const files = (event.target as HTMLInputElement).files
+  if (!files || files.length === 0) return
+  
+  Array.from(files).forEach(file => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        store.addImageObject(e.target.result as string)
+      }
     }
-  }
-  reader.readAsDataURL(file)
+    reader.readAsDataURL(file)
+  })
 }
 
 const loadSampleImage = async () => {
@@ -112,7 +116,7 @@ const exportImage = (format: 'png' | 'svg' | 'json') => {
     <div class="toolbar-group">
       <label class="toolbar-btn primary-tool">
         <FolderOpen :size="20" color="#a78bfa" />
-        <input type="file" hidden @change="handleFileUpload" accept="image/*" />
+        <input type="file" hidden @change="handleFileUpload" accept="image/*" multiple />
       </label>
       <button class="toolbar-btn" @click="saveProject"><Save :size="18" /></button>
       <button class="toolbar-btn sample-btn" @click="loadSampleImage" title="Load Sample Image">
@@ -123,8 +127,24 @@ const exportImage = (format: 'png' | 'svg' | 'json') => {
     <div class="divider"></div>
 
     <div class="toolbar-group">
-      <button class="toolbar-btn"><Undo2 :size="18" /></button>
-      <button class="toolbar-btn"><Redo2 :size="18" /></button>
+      <button 
+        class="toolbar-btn" 
+        @click="store.undo()" 
+        :disabled="store.historyIndex <= 0"
+        :class="{ disabled: store.historyIndex <= 0 }"
+        title="Undo (Ctrl+Z)"
+      >
+        <Undo2 :size="18" />
+      </button>
+      <button 
+        class="toolbar-btn" 
+        @click="store.redo()" 
+        :disabled="store.historyIndex >= store.history.length - 1"
+        :class="{ disabled: store.historyIndex >= store.history.length - 1 }"
+        title="Redo (Ctrl+Y)"
+      >
+        <Redo2 :size="18" />
+      </button>
     </div>
 
     <div class="divider"></div>
@@ -147,7 +167,26 @@ const exportImage = (format: 'png' | 'svg' | 'json') => {
       </button>
     </div>
 
-    <div class="spacer"></div>
+    <div class="spacer">
+      <div v-if="store.isSaving" class="saving-status">
+        <span class="spinner"></span> Saving...
+      </div>
+    </div>
+
+    <div class="toolbar-group auth-group">
+      <template v-if="store.user">
+        <div class="user-info">
+          <div class="avatar">{{ store.user.name.charAt(0).toUpperCase() }}</div>
+          <span class="username">{{ store.user.name }}</span>
+        </div>
+        <button class="toolbar-btn logout-btn" @click="store.logout()" title="Logout">
+          <LogOut :size="16" />
+        </button>
+      </template>
+      <button v-else class="login-btn" @click="store.isAuthModalOpen = true">
+        Log In
+      </button>
+    </div>
 
     <div class="export-dropdown">
       <button class="download-btn">
@@ -199,6 +238,12 @@ const exportImage = (format: 'png' | 'svg' | 'json') => {
 .toolbar-btn:hover {
   background-color: var(--bg-hover);
   color: var(--primary);
+}
+
+.toolbar-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .primary-tool {
@@ -298,5 +343,77 @@ const exportImage = (format: 'png' | 'svg' | 'json') => {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-group {
+  margin-right: 16px;
+}
+
+.login-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.username {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.logout-btn {
+  color: #ef4444;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.saving-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-right: 16px;
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--text-muted);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

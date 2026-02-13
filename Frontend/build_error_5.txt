@@ -1,0 +1,90 @@
+﻿
+> frontend@0.0.0 build-only
+> vite build
+
+[36mvite v6.0.11 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 123 modules transformed.
+node.exe : [31mx[39m 
+Build failed in 3.16s
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo       
+       : NotSpecified:   
+  ([31mx[39m Build f   
+ ailed in 3.16s:Strin    
+g) [], RemoteExcepti    
+on
+    + FullyQualifiedErro 
+   rId : NativeCommandE  
+  rror
+ 
+[31merror during build:
+[31m[vite]: Rollup 
+failed to resolve import 
+"@vueuse/core" from "C:/U
+sers/Assam/Documents/GitH
+ub/ColorxChange/Frontend/
+src/components/editor/Can
+vasWorkspace.vue?vue&type
+=script&setup=true&lang.t
+s".
+This is most likely 
+unintended because it 
+can break your 
+application at runtime.
+If you do want to 
+externalize this module 
+explicitly add it to
+`build.rollupOptions.exte
+rnal`[31m
+    at viteWarn (file:///
+C:/Users/Assam/Documents/
+GitHub/ColorxChange/Front
+end/node_modules/vite/dis
+t/node/chunks/dep-M1IYMR1
+6.js:51220:17)
+    at onRollupWarning (f
+ile:///C:/Users/Assam/Doc
+uments/GitHub/ColorxChang
+e/Frontend/node_modules/v
+ite/dist/node/chunks/dep-
+M1IYMR16.js:51252:5)
+    at onwarn (file:///C:
+/Users/Assam/Documents/Gi
+tHub/ColorxChange/Fronten
+d/node_modules/vite/dist/
+node/chunks/dep-M1IYMR16.
+js:50918:7)
+    at file:///C:/Users/A
+ssam/Documents/GitHub/Col
+orxChange/Frontend/node_m
+odules/rollup/dist/es/sha
+red/node-entry.js:20471:1
+3
+    at Object.logger [as 
+onLog] (file:///C:/Users/
+Assam/Documents/GitHub/Co
+lorxChange/Frontend/node_
+modules/rollup/dist/es/sh
+ared/node-entry.js:22200:
+9)
+    at ModuleLoader.handl
+eInvalidResolvedId (file:
+///C:/Users/Assam/Documen
+ts/GitHub/ColorxChange/Fr
+ontend/node_modules/rollu
+p/dist/es/shared/node-ent
+ry.js:21083:26)
+    at file:///C:/Users/A
+ssam/Documents/GitHub/Col
+orxChange/Frontend/node_m
+odules/rollup/dist/es/sha
+red/node-entry.js:21041:2
+6[39m

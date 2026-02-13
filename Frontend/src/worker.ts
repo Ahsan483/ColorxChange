@@ -193,4 +193,42 @@ self.onmessage = (e) => {
 
     self.postMessage({ type: 'effect_applied', imageData: pixels }, { transfer: [pixels.buffer] } as any)
   }
+
+  if (type === 'background_removal') {
+    const { imageData, tolerance = 30 } = data
+    const pixels = new Uint8ClampedArray(imageData)
+    
+    // Sample corners for potential background colors
+    const samples = [
+      { r: pixels[0], g: pixels[1], b: pixels[2] }, // Top-left
+      { r: pixels[pixels.length - 4], g: pixels[pixels.length - 3], b: pixels[pixels.length - 2] } // Bottom-right
+    ]
+    
+    const bgLabs = samples.map(s => {
+      const xyz = rgbToXyz(s.r, s.g, s.b)
+      return xyzToLab(xyz[0], xyz[1], xyz[2])
+    })
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i]
+      const g = pixels[i + 1]
+      const b = pixels[i + 2]
+      const a = pixels[i + 3]
+      
+      if (a === 0) continue
+
+      const xyz = rgbToXyz(r, g, b)
+      const currentLab = xyzToLab(xyz[0], xyz[1], xyz[2])
+
+      for (const bgLab of bgLabs) {
+        const diff = deltaE76(currentLab, bgLab)
+        if (diff <= tolerance) {
+          pixels[i + 3] = 0 // Transparent
+          break
+        }
+      }
+    }
+
+    self.postMessage({ type: 'bg_removed', imageData: pixels }, { transfer: [pixels.buffer] } as any)
+  }
 }

@@ -17,15 +17,16 @@ export const textPresets: TextPreset[] = [
     fill: '#C0C0C0',
     gradient: {
       type: 'linear',
-      angle: 90,
-      colors: [
+      rotation: 90,
+      stops: [
         { offset: 0, color: '#e3e4e5' },
         { offset: 0.5, color: '#7d7e80' },
         { offset: 1, color: '#e3e4e5' }
       ]
     },
     shadow: { color: 'rgba(0,0,0,0.5)', blur: 15, offsetX: 5, offsetY: 5, opacity: 1 },
-    stroke: { color: '#ffffff', width: 1, enabled: true }
+    stroke: undefined,
+    strokes: [{ id: '1', color: '#ffffff', width: 1, opacity: 1 }]
   },
   {
     name: 'Electric Neon',
@@ -33,7 +34,8 @@ export const textPresets: TextPreset[] = [
     fontFamily: 'Orbitron',
     fill: '#fff',
     shadow: { color: '#00f2ff', blur: 30, offsetX: 0, offsetY: 0, opacity: 1 },
-    stroke: { color: '#00f2ff', width: 2, enabled: true }
+    stroke: undefined,
+    strokes: [{ id: '1', color: '#00f2ff', width: 2, opacity: 1 }]
   },
   ...proceduralPresets,
   // ... (keep existing handcrafted ones)
@@ -44,7 +46,8 @@ export const textPresets: TextPreset[] = [
     fontFamily: 'Bangers',
     fill: '#ff0000',
     shadow: { color: '#000000', blur: 0, offsetX: 5, offsetY: 5, opacity: 1 },
-    stroke: { color: '#ffffff', width: 2, enabled: true }
+    stroke: undefined,
+    strokes: [{ id: '1', color: '#ffffff', width: 2, opacity: 1 }]
   },
   {
     name: 'Cyber Glitch',
@@ -52,7 +55,8 @@ export const textPresets: TextPreset[] = [
     fontFamily: 'Russo One',
     fill: '#00ffff',
     shadow: { color: '#ff00ff', blur: 0, offsetX: -4, offsetY: 0, opacity: 0.8 },
-    stroke: { color: '#ffffff', width: 1, enabled: true }
+    stroke: undefined,
+    strokes: [{ id: '1', color: '#ffffff', width: 1, opacity: 1 }]
   },
 
   // LUXURY & PREMIUM
@@ -63,8 +67,8 @@ export const textPresets: TextPreset[] = [
     fill: '#D4AF37',
     gradient: {
       type: 'linear',
-      angle: 45,
-      colors: [
+      rotation: 45,
+      stops: [
         { offset: 0, color: '#BF953F' },
         { offset: 0.5, color: '#FCF6BA' },
         { offset: 1, color: '#AA771C' }
@@ -98,8 +102,8 @@ export const textPresets: TextPreset[] = [
     fill: '#ffffff',
     gradient: {
       type: 'linear',
-      angle: 0,
-      colors: [
+      rotation: 0,
+      stops: [
         { offset: 0, color: '#000046' },
         { offset: 1, color: '#1cb5e0' }
       ]
@@ -115,8 +119,8 @@ export const textPresets: TextPreset[] = [
     fill: '#ff00ff',
     gradient: {
       type: 'linear',
-      angle: 90,
-      colors: [
+      rotation: 90,
+      stops: [
         { offset: 0, color: '#00ffff' },
         { offset: 1, color: '#ff00ff' }
       ]
@@ -128,7 +132,8 @@ export const textPresets: TextPreset[] = [
     category: 'Retro',
     fontFamily: 'Press Start 2P',
     fill: '#fff',
-    stroke: { color: '#000', width: 2, enabled: true },
+    stroke: undefined,
+    strokes: [{ id: '1', color: '#000', width: 2, opacity: 1 }],
     shadow: { color: '#ff0000', blur: 0, offsetX: 2, offsetY: 0, opacity: 0.5 }
   }
 ]

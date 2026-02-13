@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useEditorStore } from '@/stores/editor'
 import { textPresets } from '@/data/textPresets'
-import { Search, LayoutGrid } from 'lucide-vue-next'
+import { Search, Sparkles } from 'lucide-vue-next'
 
 const store = useEditorStore()
 const searchQuery = ref('')
@@ -26,6 +26,43 @@ const filteredPresets = computed(() => {
 const applyPreset = (preset: any) => {
   store.applyPreset(preset)
 }
+
+const getPresetStyle = (preset: any) => {
+  const style: any = {
+    fontFamily: preset.fontFamily,
+    fontWeight: 'bold',
+  }
+
+  // Handle Gradient vs Solid Fill
+  if (preset.gradient && preset.gradient.colors && preset.gradient.colors.length > 0) {
+    const colors = preset.gradient.colors.map((c: any) => `${c.color} ${c.offset * 100}%`).join(', ')
+    // Default to linear gradient from top to bottom if not specified
+    const type = preset.gradient.type === 'radial' ? 'radial-gradient' : 'linear-gradient'
+    const direction = type === 'linear-gradient' ? 'to bottom, ' : 'circle, '
+    
+    style.backgroundImage = `${type}(${direction}${colors})`
+    style.webkitBackgroundClip = 'text'
+    style.backgroundClip = 'text'
+    style.webkitTextFillColor = 'transparent'
+    style.color = 'transparent' // Fallback
+  } else {
+    style.color = preset.fill
+  }
+
+  // Handle Stroke
+  if (preset.stroke && preset.stroke.enabled) {
+    style.webkitTextStroke = `${preset.stroke.width / 2}px ${preset.stroke.color}`
+  }
+
+  // Handle Shadow/Glow
+  if (preset.shadow && preset.shadow.opacity > 0) {
+    // Scale down shadow for preview
+    const s = preset.shadow
+    style.textShadow = `${s.offsetX/2}px ${s.offsetY/2}px ${s.blur/2}px ${s.color}`
+  }
+
+  return style
+}
 </script>
 
 <template>
@@ -34,10 +71,10 @@ const applyPreset = (preset: any) => {
       <div class="search-bar">
         <div class="input-wrapper">
           <Search :size="14" class="search-icon" />
-          <input v-model="searchQuery" placeholder="Search 1,100+ styles..." />
+          <input v-model="searchQuery" placeholder="Search styles..." />
         </div>
-        <button class="random-btn" @click="generateRandomStyle" title="Style Randomizer (🪄)">
-          <Sparkles :size="16" />
+        <button class="random-btn" @click="generateRandomStyle" title="Randomize">
+          <Sparkles :size="14" />
         </button>
       </div>
       
@@ -55,22 +92,17 @@ const applyPreset = (preset: any) => {
     </div>
 
     <div class="preset-scroll-area">
-      <div class="preset-grid">
+      <div class="preset-slider"> 
         <div 
           v-for="preset in filteredPresets" 
           :key="preset.name" 
-          class="style-card"
+          class="style-card-compact"
           @click="applyPreset(preset)"
         >
-          <div class="style-preview" :style="{ 
-            fontFamily: preset.fontFamily,
-            color: (preset.gradient && preset.gradient.colors) ? preset.gradient.colors[0].color : preset.fill,
-            textShadow: preset.shadow ? `${preset.shadow.offsetX/2}px ${preset.shadow.offsetY/2}px ${preset.shadow.blur/2}px ${preset.shadow.color}` : 'none',
-            letterSpacing: (preset.letterSpacing || 0) / 2 + 'px'
-          }">
-            ABC
+          <div class="style-preview-mini" :style="getPresetStyle(preset)">
+            Aa
           </div>
-          <span class="style-name">{{ preset.name.replace(/^(Neon|Luxury|Space|Nature|Pastel|Modern|Kids|Fashion|Wedding|Corporate|Effects)\s+/, '') }}</span>
+          <span class="style-name-mini">{{ preset.name.replace(/^(Neon|Luxury|Space|Nature|Pastel|Modern|Kids|Fashion|Wedding|Corporate|Effects)\s+/, '') }}</span>
         </div>
       </div>
     </div>
@@ -91,154 +123,149 @@ const applyPreset = (preset: any) => {
   z-index: 10;
   background: var(--bg-panel);
   border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
 }
 
 .search-bar { 
-  padding: 16px; 
+  padding: 12px 16px; 
   display: flex; 
-  gap: 12px; 
+  gap: 8px; 
 }
 
 .input-wrapper { 
-  position: relative; 
   flex: 1; 
   background: var(--bg-app); 
   border: 1px solid var(--border-color); 
-  border-radius: 20px; 
+  border-radius: 4px; 
   display: flex; 
   align-items: center; 
-  padding: 0 16px; 
+  padding: 0 10px; 
   transition: all 0.2s;
+  height: 32px;
 }
 
 .input-wrapper:focus-within { 
   border-color: var(--primary); 
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); 
+  box-shadow: 0 0 0 1px var(--primary); 
   background: var(--bg-panel);
 }
 
-.search-icon { color: var(--text-muted); margin-right: 10px; }
+.search-icon { color: var(--text-muted); margin-right: 8px; }
 
 .input-wrapper input { 
   background: none; 
   border: none; 
   color: var(--text-primary); 
-  font-size: 13px; 
+  font-size: 12px; 
   width: 100%; 
-  height: 40px; 
+  height: 100%;
   outline: none; 
 }
 
 .random-btn {
-  background: var(--primary);
-  border: none;
-  border-radius: 50%;
-  color: white;
-  width: 40px;
-  height: 40px;
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--primary);
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: var(--shadow-md);
 }
 
 .random-btn:hover {
-  transform: scale(1.05) rotate(15deg);
-  background: var(--primary-hover);
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 .category-strip {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
-  padding: 0 16px 16px 16px;
+  padding: 0 16px;
   scrollbar-width: none;
 }
 .category-strip::-webkit-scrollbar { display: none; }
 
 .cat-tag {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  padding: 6px 16px;
-  background: var(--bg-app);
+  padding: 4px 10px;
+  background: transparent;
   color: var(--text-secondary);
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
+  border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
+  border: 1px solid transparent; /* fixed height prevent jump */
 }
 
 .cat-tag:hover { 
-  border-color: var(--primary); 
   color: var(--primary); 
   background: var(--bg-hover);
 }
 
 .cat-tag.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-active);
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .preset-scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 12px;
   background: var(--bg-app);
 }
 
-.preset-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 16px;
+/* Horizontal Slider Layout */
+.preset-slider {
+  display: flex;
+  flex-direction: column; /* Stack vertically for "list" view or wrap for dense grid */
+  gap: 4px;
 }
 
-.style-card {
+.style-card-compact {
   background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 16px;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Horizontal layout for list item */
   align-items: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+  border: 1px solid transparent;
 }
 
-.style-card:hover {
-  border-color: var(--primary);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+.style-card-compact:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-active);
 }
 
-.style-preview {
-  height: 80px;
-  width: 100%;
+.style-preview-mini {
+  height: 24px;
+  width: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
-  font-weight: 800;
-  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-right: 12px;
   pointer-events: none;
 }
 
-.style-name {
+.style-name-mini {
   font-size: 12px;
   color: var(--text-primary);
-  text-align: center;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  text-align: left;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
+  flex: 1;
 }
 </style>

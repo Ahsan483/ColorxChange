@@ -45,19 +45,19 @@ export function generateProceduralPresets(): TextPreset[] {
         fontFamily: font,
         fill: color,
         shadow: { color: 'rgba(0,0,0,0.3)', blur: 10, offsetX: 3, offsetY: 3, opacity: 1 },
-        stroke: { color: '#ffffff', width: 0, enabled: false },
+        stroke: undefined,
         letterSpacing: Math.random() > 0.8 ? 5 : 0
       }
 
       // Add special effects based on category
       if (cat === 'neon') {
         preset.shadow = { color: color, blur: 25, offsetX: 0, offsetY: 0, opacity: 1 }
-        preset.stroke = { color: '#ffffff', width: 1, enabled: true }
+        preset.strokes = [{ id: '1', color: '#ffffff', width: 1, opacity: 1 }]
       } else if (cat === 'luxury') {
         preset.gradient = {
           type: 'linear',
-          angle: 45,
-          colors: [
+          rotation: 45,
+          stops: [
             { offset: 0, color: color },
             { offset: 0.5, color: '#ffffff' },
             { offset: 1, color: color }
@@ -66,8 +66,8 @@ export function generateProceduralPresets(): TextPreset[] {
       } else if (cat === 'space') {
         preset.gradient = {
           type: 'linear',
-          angle: 90,
-          colors: [
+          rotation: 90,
+          stops: [
             { offset: 0, color: color },
             { offset: 1, color: '#000000' }
           ]

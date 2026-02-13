@@ -6,18 +6,30 @@ import {
   Type, 
   Image as ImageIcon, 
   Sparkles, 
-  Pencil 
+  Pencil,
+  Crop,
+  Eraser,
+  Square,
+  PaintBucket,
+  ZoomIn,
+  Hand
 } from 'lucide-vue-next'
 
 const store = useEditorStore()
 
 const tools = [
-  { id: 'select', icon: MousePointer2, label: 'Select' },
-  { id: 'picker', icon: Pipette, label: 'Color Picker' },
-  { id: 'text', icon: Type, label: 'Text' },
-  { id: 'image', icon: ImageIcon, label: 'Image Overlay' },
-  { id: 'effect', icon: Sparkles, label: 'Effects' },
-  { id: 'draw', icon: Pencil, label: 'Draw' },
+  { id: 'select', icon: MousePointer2, label: 'Move / Select (V)' },
+  { id: 'crop', icon: Crop, label: 'Crop Tool (C)' },
+  { id: 'picker', icon: Pipette, label: 'Eyedropper (I)' },
+  { id: 'brush', icon: Pencil, label: 'Brush Tool (B)' },
+  { id: 'eraser', icon: Eraser, label: 'Eraser (E)' },
+  { id: 'text', icon: Type, label: 'Type Tool (T)' },
+  { id: 'shape', icon: Square, label: 'Rectangle (U)' },
+  { id: 'fill', icon: PaintBucket, label: 'Gradient / Fill (G)' },
+  { id: 'image', icon: ImageIcon, label: 'Place Image' },
+  { id: 'effect', icon: Sparkles, label: 'Magic Effects' },
+  { id: 'hand', icon: Hand, label: 'Hand Tool (H)' },
+  { id: 'zoom', icon: ZoomIn, label: 'Zoom (Z)' },
 ]
 
 const selectTool = (id: string) => {

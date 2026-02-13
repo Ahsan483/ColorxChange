@@ -116,14 +116,46 @@ Prisma.NullTypes = {
  */
 
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
+
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  password: 'password',
+  name: 'name',
+  role: 'role',
+  tier: 'tier',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
 
 exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
   thumbnail: 'thumbnail',
-  content: 'content',
+  data: 'data',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VersionScalarFieldEnum = {
+  id: 'id',
+  data: 'data',
+  projectId: 'projectId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  stripeCustomerId: 'stripeCustomerId',
+  status: 'status',
+  planId: 'planId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -132,6 +164,7 @@ exports.Prisma.MediaScalarFieldEnum = {
   id: 'id',
   type: 'type',
   url: 'url',
+  userId: 'userId',
   createdAt: 'createdAt'
 };
 
@@ -140,14 +173,32 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
 
 exports.Prisma.ModelName = {
+  User: 'User',
   Project: 'Project',
+  Version: 'Version',
+  Subscription: 'Subscription',
   Media: 'Media'
 };
 
